@@ -1,6 +1,18 @@
 # HarmonyOS_Sans_Webfont_Splitted
 
+[![NPM Version](https://img.shields.io/npm/v/harmonyos-sans-webfont-splitted)](https://www.npmjs.com/package/harmonyos-sans-webfont-splitted)
+
 HarmonyOS Sans Webfont Splitted by [KonghaYao/cn-font-split](https://github.com/KonghaYao/cn-font-split/tree/release/packages/ffi-js).
+
+## NPM & CDN
+
+[![NPM Version](https://img.shields.io/npm/v/harmonyos-sans-webfont-splitted)](https://www.npmjs.com/package/harmonyos-sans-webfont-splitted)
+
+```plain
+https://unpkg.com/harmonyos-sans-webfont-splitted@1.1.0/dist/HarmonyOS_Sans/Regular/Regular.css
+https://unpkg.com/harmonyos-sans-webfont-splitted@1.1.0/dist/HarmonyOS_Sans_SC/Regular/Regular.css
+https://unpkg.com/harmonyos-sans-webfont-splitted@1.1.0/dist/HarmonyOS_Sans_TC/Bold/Bold.css
+```
 
 ## Get Raw Fonts
 
