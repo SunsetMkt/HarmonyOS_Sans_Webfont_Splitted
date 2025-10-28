@@ -84,12 +84,10 @@ async function split(input, outDir, weight, fontFamily) {
     console.timeEnd("node");
 }
 
-// If HarmonyOS_Sans_Webfont_Splitted already exists, delete it
-if (fs.existsSync("./HarmonyOS_Sans_Webfont_Splitted")) {
-    console.info(
-        "HarmonyOS_Sans_Webfont_Splitted/ already exists, delete it first."
-    );
-    fs.rmSync("./HarmonyOS_Sans_Webfont_Splitted", { recursive: true });
+// If dist already exists, delete it
+if (fs.existsSync("./dist")) {
+    console.info("dist/ already exists, delete it first.");
+    fs.rmSync("./dist", { recursive: true });
 }
 
 const harmonyOsSansDir = "./HarmonyOS_Sans";
@@ -135,7 +133,7 @@ for (const subfolder of fontSubfolders) {
         }
 
         const inputPath = path.join(subfolderPath, file);
-        const outputDir = `./HarmonyOS_Sans_Webfont_Splitted/${subfolder}/${weight}`;
+        const outputDir = `./dist/${subfolder}/${weight}`;
 
         await split(inputPath, outputDir, weight, fontFamily);
 
@@ -153,10 +151,5 @@ for (const subfolder of fontSubfolders) {
         });
     }
 }
-
-// Copy artifacts to dist
-fs.cpSync("./HarmonyOS_Sans_Webfont_Splitted", "./dist", {
-    recursive: true,
-});
 
 console.log("\nDone!");
