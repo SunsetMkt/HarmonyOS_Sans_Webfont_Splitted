@@ -4,7 +4,7 @@ HarmonyOS Sans Webfont Splitted by [KonghaYao/cn-font-split](https://github.com/
 
 ## Get Raw Fonts
 
-[Docs](https://developer.huawei.com/consumer/cn/doc/design-guides/font-0000001828772001#section55510217189) or [Download Zip](https://developer.huawei.com/images/download/next/HarmonyOS-Sans-v2.zip)
+[Docs](https://developer.huawei.com/consumer/cn/doc/design-guides/font-0000001828772001#section55510217189) or [Download Zip](https://developer.huawei.com/images/download/next/HarmonyOS-Sans-v2.zip)/[Another Link](https://alliance-communityfile-drcn.dbankcdn.com/FileServer/getFile/cmtyManage/011/111/111/0000000000011111111.20250923104318.11664078982054632530113858317517:50001231000000:2800:C0DB7AC2067D28B96607BC0D598A48EAF74CA1B7D936B819A36F67CB6E071F30.zip?needInitFileName=true)
 
 ## Quick Start (Build)
 
