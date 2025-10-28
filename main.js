@@ -147,50 +147,6 @@ for (const subfolder of fontSubfolders) {
     }
 }
 
-// Make Merged Font directory
-const mergedDir = "./HarmonyOS_Sans_Webfont_Splitted/Merged";
-fs.mkdirSync(mergedDir, { recursive: true });
-
-// Generate merged CSS files for each subfolder (without copying woff2 files)
-const subfolderGroups = {};
-for (const font of processedFonts) {
-    if (!subfolderGroups[font.subfolder]) {
-        subfolderGroups[font.subfolder] = [];
-    }
-    subfolderGroups[font.subfolder].push(font);
-}
-
-// Create a merged CSS for each subfolder
-for (const [subfolder, fonts] of Object.entries(subfolderGroups)) {
-    let mergedCss = `@charset "UTF-8";\n\n`;
-    mergedCss += `/* ${subfolder} - All Weights */\n\n`;
-
-    for (const font of fonts) {
-        mergedCss += `/* ${font.weight} */\n`;
-        mergedCss += fs.readFileSync(font.cssPath, "utf8");
-        mergedCss += "\n\n";
-    }
-
-    const subfolderMergedPath = path.join(mergedDir, `${subfolder}.css`);
-    fs.writeFileSync(subfolderMergedPath, mergedCss);
-    console.log(`Created merged CSS: ${subfolderMergedPath}`);
-}
-
-// Create an overall index.css that includes all subfolders
-let indexCss = `@charset "UTF-8";\n\n`;
-indexCss += `/* HarmonyOS Sans - All Font Families */\n\n`;
-
-for (const subfolder of fontSubfolders) {
-    const subfolderMergedPath = path.join(mergedDir, `${subfolder}.css`);
-    if (fs.existsSync(subfolderMergedPath)) {
-        indexCss += `/* ${subfolder} */\n`;
-        indexCss += fs.readFileSync(subfolderMergedPath, "utf8");
-        indexCss += "\n\n";
-    }
-}
-
-fs.writeFileSync(path.join(mergedDir, "index.css"), indexCss);
-
 // Copy artifacts to dist
 fs.cpSync("./HarmonyOS_Sans_Webfont_Splitted", "./dist", {
     recursive: true,
