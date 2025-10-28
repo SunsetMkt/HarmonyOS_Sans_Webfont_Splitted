@@ -18,15 +18,18 @@ var fontWeightMap = {
 // Extract weight from filename based on different naming patterns
 function extractWeight(filename) {
     // Remove .ttf extension
-    const nameWithoutExt = filename.replace('.ttf', '');
-    
+    const nameWithoutExt = filename.replace(".ttf", "");
+
     // Try to match weight at the end of the filename
     for (const weight in fontWeightMap) {
-        if (nameWithoutExt.endsWith(`_${weight}`) || nameWithoutExt.endsWith(weight)) {
+        if (
+            nameWithoutExt.endsWith(`_${weight}`) ||
+            nameWithoutExt.endsWith(weight)
+        ) {
             return weight;
         }
     }
-    
+
     return null;
 }
 
@@ -106,40 +109,40 @@ const processedFonts = [];
 for (const subfolder of fontSubfolders) {
     const subfolderPath = path.join(harmonyOsSansDir, subfolder);
     const files = fs.readdirSync(subfolderPath);
-    
+
     // Determine font family name (cleanup the subfolder name)
-    const fontFamily = subfolder.replace(/_/g, ' ');
-    
+    const fontFamily = subfolder.replace(/_/g, " ");
+
     console.log(`\nProcessing ${subfolder}...`);
-    
+
     // Process each .ttf file in the subfolder
     for (const file of files) {
         if (!file.endsWith(".ttf")) {
             continue;
         }
-        
+
         const weight = extractWeight(file);
         if (!weight) {
             console.warn(`Could not extract weight from ${file}, skipping...`);
             continue;
         }
-        
+
         const inputPath = path.join(subfolderPath, file);
         const outputDir = `./HarmonyOS_Sans_Webfont_Splitted/${subfolder}/${weight}`;
-        
+
         await split(inputPath, outputDir, weight, fontFamily);
-        
+
         // Copy result.css to weight.css
         const resultCssPath = path.join(outputDir, "result.css");
         const weightCssPath = path.join(outputDir, `${weight}.css`);
         fs.copyFileSync(resultCssPath, weightCssPath);
-        
+
         // Track this for Merged generation
         processedFonts.push({
             subfolder,
             weight,
             fontFamily,
-            cssPath: weightCssPath
+            cssPath: weightCssPath,
         });
     }
 }
@@ -161,13 +164,13 @@ for (const font of processedFonts) {
 for (const [subfolder, fonts] of Object.entries(subfolderGroups)) {
     let mergedCss = `@charset "UTF-8";\n\n`;
     mergedCss += `/* ${subfolder} - All Weights */\n\n`;
-    
+
     for (const font of fonts) {
         mergedCss += `/* ${font.weight} */\n`;
         mergedCss += fs.readFileSync(font.cssPath, "utf8");
         mergedCss += "\n\n";
     }
-    
+
     const subfolderMergedPath = path.join(mergedDir, `${subfolder}.css`);
     fs.writeFileSync(subfolderMergedPath, mergedCss);
     console.log(`Created merged CSS: ${subfolderMergedPath}`);
@@ -188,8 +191,8 @@ for (const subfolder of fontSubfolders) {
 
 fs.writeFileSync(path.join(mergedDir, "index.css"), indexCss);
 
-// Copy Merged to dist
-fs.cpSync(mergedDir, "./dist", {
+// Copy artifacts to dist
+fs.cpSync("./HarmonyOS_Sans_Webfont_Splitted", "./dist", {
     recursive: true,
 });
 
