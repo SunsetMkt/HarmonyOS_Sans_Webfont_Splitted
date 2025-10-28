@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { fontSplit } from "cn-font-split";
 
 // Ref: https://github.com/IKKI2000/harmonyos-fonts/blob/main/css/harmonyos_sans_sc.css
@@ -11,9 +12,25 @@ var fontWeightMap = {
     Semibold: 600,
     Bold: 700,
     Black: 900,
+    Heavy: 900, // For Arabic fonts
 };
 
-async function split(input, outDir, weight) {
+// Extract weight from filename based on different naming patterns
+function extractWeight(filename) {
+    // Remove .ttf extension
+    const nameWithoutExt = filename.replace('.ttf', '');
+    
+    // Try to match weight at the end of the filename
+    for (const weight in fontWeightMap) {
+        if (nameWithoutExt.endsWith(`_${weight}`) || nameWithoutExt.endsWith(weight)) {
+            return weight;
+        }
+    }
+    
+    return null;
+}
+
+async function split(input, outDir, weight, fontFamily) {
     const inputBuffer = new Uint8Array(fs.readFileSync(input).buffer);
 
     console.log(`Splitting ${input}...`);
@@ -30,11 +47,11 @@ async function split(input, outDir, weight) {
         outDir: outDir, // 输出目录
         css: {
             // CSS 输出产物配置，一般而言不需要手动配置
-            fontFamily: "HarmonyOS Sans", // 输出 css 产物的 font-family 名称
+            fontFamily: fontFamily, // 输出 css 产物的 font-family 名称
             fontWeight: `${weight_num}`, // 字重: 400 (常规)、700(粗体), 详细可见 https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
             fontStyle: "normal", // 字体样式: normal (常规)、italic (斜体)。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
             fontDisplay: "swap", // 字体显示策略，推荐 swap。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
-            localFamily: [`HarmonyOS Sans ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
+            localFamily: [`${fontFamily} ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
             // commentUnicodes: false, // 在 CSS 中添加 Unicode 码点注释
             compress: false, // 压缩生成的 CSS 产物
         },
@@ -65,70 +82,107 @@ if (fs.existsSync("./HarmonyOS_Sans_Webfont_Splitted")) {
     process.exit(1);
 }
 
-// For every .ttf in HarmonyOS_Sans_SC folder
-for (const file of fs.readdirSync("./HarmonyOS_Sans_SC")) {
-    var dirName = file.split(".")[0].split("HarmonyOS_SansSC_")[1];
-    if (file.endsWith(".ttf")) {
-        await split(
-            `./HarmonyOS_Sans_SC/${file}`,
-            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}`,
-            dirName
-        );
-        // Copy ./HarmonyOS_Sans_Webfont_Splitted/${dirName}/result.css
-        // to ./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css
-        fs.copyFileSync(
-            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/result.css`,
-            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`
-        );
-    }
-}
+const harmonyOsSansDir = "./HarmonyOS_Sans";
 
-// Make Merged Font
-// Mkdir ./HarmonyOS_Sans_Webfont_Splitted/Merged
-fs.mkdirSync("./HarmonyOS_Sans_Webfont_Splitted/Merged");
+// Process every font subfolder in HarmonyOS_Sans folder
+const fontSubfolders = fs.readdirSync(harmonyOsSansDir).filter((item) => {
+    const itemPath = path.join(harmonyOsSansDir, item);
+    return fs.statSync(itemPath).isDirectory();
+});
 
-// Copy ./HarmonyOS_Sans_Webfont_Splitted/[dirName]/*.woff2
-// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/
-for (const dirName in fontWeightMap) {
-    // List all files in ./HarmonyOS_Sans_Webfont_Splitted/[dirName]
-    for (const file of fs.readdirSync(
-        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}`
-    )) {
-        if (file.endsWith(".woff2")) {
-            fs.copyFileSync(
-                `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${file}`,
-                `./HarmonyOS_Sans_Webfont_Splitted/Merged/${file}`
-            );
+console.log(`Found ${fontSubfolders.length} font subfolders:`, fontSubfolders);
+
+// Store all processed subfolders and their weights for Merged generation
+const processedFonts = [];
+
+for (const subfolder of fontSubfolders) {
+    const subfolderPath = path.join(harmonyOsSansDir, subfolder);
+    const files = fs.readdirSync(subfolderPath);
+    
+    // Determine font family name (cleanup the subfolder name)
+    const fontFamily = subfolder.replace(/_/g, ' ');
+    
+    console.log(`\nProcessing ${subfolder}...`);
+    
+    // Process each .ttf file in the subfolder
+    for (const file of files) {
+        if (!file.endsWith(".ttf")) {
+            continue;
         }
+        
+        const weight = extractWeight(file);
+        if (!weight) {
+            console.warn(`Could not extract weight from ${file}, skipping...`);
+            continue;
+        }
+        
+        const inputPath = path.join(subfolderPath, file);
+        const outputDir = `./HarmonyOS_Sans_Webfont_Splitted/${subfolder}/${weight}`;
+        
+        await split(inputPath, outputDir, weight, fontFamily);
+        
+        // Copy result.css to weight.css
+        const resultCssPath = path.join(outputDir, "result.css");
+        const weightCssPath = path.join(outputDir, `${weight}.css`);
+        fs.copyFileSync(resultCssPath, weightCssPath);
+        
+        // Track this for Merged generation
+        processedFonts.push({
+            subfolder,
+            weight,
+            fontFamily,
+            cssPath: weightCssPath
+        });
     }
 }
 
-// Copy ./HarmonyOS_Sans_Webfont_Splitted/[dirName]/[dirName].css
-// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/[dirName].css
-for (const dirName in fontWeightMap) {
-    fs.copyFileSync(
-        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`,
-        `./HarmonyOS_Sans_Webfont_Splitted/Merged/${dirName}.css`
-    );
+// Make Merged Font directory
+const mergedDir = "./HarmonyOS_Sans_Webfont_Splitted/Merged";
+fs.mkdirSync(mergedDir, { recursive: true });
+
+// Generate merged CSS files for each subfolder (without copying woff2 files)
+const subfolderGroups = {};
+for (const font of processedFonts) {
+    if (!subfolderGroups[font.subfolder]) {
+        subfolderGroups[font.subfolder] = [];
+    }
+    subfolderGroups[font.subfolder].push(font);
 }
 
-// Merge ./HarmonyOS_Sans_Webfont_Splitted/Merged/*.css
-// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/Merged.css
-var merged = `@charset "UTF-8";\n\n`;
-for (const dirName in fontWeightMap) {
-    merged += `/* ${dirName}.css */\n`;
-    merged += fs.readFileSync(
-        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`,
-        "utf8"
-    );
-    merged += "\n\n";
+// Create a merged CSS for each subfolder
+for (const [subfolder, fonts] of Object.entries(subfolderGroups)) {
+    let mergedCss = `@charset "UTF-8";\n\n`;
+    mergedCss += `/* ${subfolder} - All Weights */\n\n`;
+    
+    for (const font of fonts) {
+        mergedCss += `/* ${font.weight} */\n`;
+        mergedCss += fs.readFileSync(font.cssPath, "utf8");
+        mergedCss += "\n\n";
+    }
+    
+    const subfolderMergedPath = path.join(mergedDir, `${subfolder}.css`);
+    fs.writeFileSync(subfolderMergedPath, mergedCss);
+    console.log(`Created merged CSS: ${subfolderMergedPath}`);
 }
 
-fs.writeFileSync("./HarmonyOS_Sans_Webfont_Splitted/Merged/index.css", merged);
+// Create an overall index.css that includes all subfolders
+let indexCss = `@charset "UTF-8";\n\n`;
+indexCss += `/* HarmonyOS Sans - All Font Families */\n\n`;
 
-// Copy ./HarmonyOS_Sans_Webfont_Splitted/Merged to ./dist recursively
-fs.cpSync("./HarmonyOS_Sans_Webfont_Splitted/Merged", "./dist", {
+for (const subfolder of fontSubfolders) {
+    const subfolderMergedPath = path.join(mergedDir, `${subfolder}.css`);
+    if (fs.existsSync(subfolderMergedPath)) {
+        indexCss += `/* ${subfolder} */\n`;
+        indexCss += fs.readFileSync(subfolderMergedPath, "utf8");
+        indexCss += "\n\n";
+    }
+}
+
+fs.writeFileSync(path.join(mergedDir, "index.css"), indexCss);
+
+// Copy Merged to dist
+fs.cpSync(mergedDir, "./dist", {
     recursive: true,
 });
 
-console.log("Done!");
+console.log("\nDone!");
