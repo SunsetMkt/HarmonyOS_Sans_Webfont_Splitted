@@ -84,12 +84,12 @@ async function split(input, outDir, weight, fontFamily) {
     console.timeEnd("node");
 }
 
-// If HarmonyOS_Sans_Webfont_Splitted already exists, raise error
+// If HarmonyOS_Sans_Webfont_Splitted already exists, delete it
 if (fs.existsSync("./HarmonyOS_Sans_Webfont_Splitted")) {
-    console.error(
+    console.info(
         "HarmonyOS_Sans_Webfont_Splitted/ already exists, delete it first."
     );
-    process.exit(1);
+    fs.rmSync("./HarmonyOS_Sans_Webfont_Splitted", { recursive: true });
 }
 
 const harmonyOsSansDir = "./HarmonyOS_Sans";
