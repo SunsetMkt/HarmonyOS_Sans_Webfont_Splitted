@@ -108,9 +108,6 @@ const fontSubfolders = fs.readdirSync(harmonyOsSansDir).filter((item) => {
 
 console.log(`Found ${fontSubfolders.length} font subfolders:`, fontSubfolders);
 
-// Store all processed subfolders and their weights for Merged generation
-const processedFonts = [];
-
 for (const subfolder of fontSubfolders) {
     const subfolderPath = path.join(harmonyOsSansDir, subfolder);
     const files = fs.readdirSync(subfolderPath);
@@ -142,13 +139,14 @@ for (const subfolder of fontSubfolders) {
         const weightCssPath = path.join(outputDir, `${weight}.css`);
         fs.copyFileSync(resultCssPath, weightCssPath);
 
-        // Track this for Merged generation
-        processedFonts.push({
-            subfolder,
-            weight,
-            fontFamily,
-            cssPath: weightCssPath,
-        });
+        // Copy weight.css to upper folder
+        const upperFolder = path.dirname(outputDir);
+        const upperFolderCssPath = path.join(upperFolder, `${weight}.css`);
+        // Replace "./" path with "./weight/" path
+        const upperFolderCssContent = fs
+            .readFileSync(resultCssPath, "utf-8")
+            .replace(/\.\//g, `./${weight}/`);
+        fs.writeFileSync(upperFolderCssPath, upperFolderCssContent);
     }
 }
 
