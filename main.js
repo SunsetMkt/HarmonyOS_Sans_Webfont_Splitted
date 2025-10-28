@@ -84,6 +84,14 @@ if (fs.existsSync("./HarmonyOS_Sans_Webfont_Splitted")) {
 
 const harmonyOsSansDir = "./HarmonyOS_Sans";
 
+// Check if HarmonyOS_Sans directory exists
+if (!fs.existsSync(harmonyOsSansDir)) {
+    console.error(
+        `${harmonyOsSansDir}/ directory does not exist. Please ensure font files are in place.`
+    );
+    process.exit(1);
+}
+
 // Process every font subfolder in HarmonyOS_Sans folder
 const fontSubfolders = fs.readdirSync(harmonyOsSansDir).filter((item) => {
     const itemPath = path.join(harmonyOsSansDir, item);
