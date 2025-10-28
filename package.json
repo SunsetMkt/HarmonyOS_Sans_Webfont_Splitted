@@ -1,0 +1,34 @@
+{
+    "name": "harmonyos-sans-webfont-splitted",
+    "version": "1.0.0",
+    "description": "HarmonyOS Sans Webfont Splitted by KonghaYao/cn-font-split.",
+    "files": [
+        "dist/",
+        "main.js",
+        "LICENSE",
+        "package.json"
+    ],
+    "main": "dist/index.css",
+    "style": "dist/index.css",
+    "exports": {
+        "default": "./dist/index.css"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "node main.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/SunsetMkt/HarmonyOS_Sans_Webfont_Splitted.git"
+    },
+    "author": "SunsetMkt",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/SunsetMkt/HarmonyOS_Sans_Webfont_Splitted/issues"
+    },
+    "homepage": "https://github.com/SunsetMkt/HarmonyOS_Sans_Webfont_Splitted#readme",
+    "dependencies": {
+        "cn-font-split": "6"
+    },
+    "type": "module"
+}
