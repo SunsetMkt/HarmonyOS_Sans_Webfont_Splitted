@@ -44,6 +44,13 @@ async function split(input, outDir, weight, fontFamily) {
         return;
     }
 
+    var isItalic = false;
+    var fontStyle = "normal";
+    if (fontFamily.includes("Italic")) {
+        isItalic = true;
+        fontStyle = "italic";
+    }
+
     console.time("node");
     await fontSplit({
         input: inputBuffer, // 输入的字体缓冲区
@@ -52,7 +59,7 @@ async function split(input, outDir, weight, fontFamily) {
             // CSS 输出产物配置，一般而言不需要手动配置
             fontFamily: fontFamily, // 输出 css 产物的 font-family 名称
             fontWeight: `${weight_num}`, // 字重: 400 (常规)、700(粗体), 详细可见 https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
-            fontStyle: "normal", // 字体样式: normal (常规)、italic (斜体)。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
+            fontStyle: fontStyle, // 字体样式: normal (常规)、italic (斜体)。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
             fontDisplay: "swap", // 字体显示策略，推荐 swap。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
             localFamily: [`${fontFamily} ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
             // commentUnicodes: false, // 在 CSS 中添加 Unicode 码点注释
