@@ -30,11 +30,11 @@ async function split(input, outDir, weight) {
         outDir: outDir, // 输出目录
         css: {
             // CSS 输出产物配置，一般而言不需要手动配置
-            fontFamily: "HarmonyOS Sans SC", // 输出 css 产物的 font-family 名称
+            fontFamily: "HarmonyOS Sans", // 输出 css 产物的 font-family 名称
             fontWeight: `${weight_num}`, // 字重: 400 (常规)、700(粗体), 详细可见 https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
             fontStyle: "normal", // 字体样式: normal (常规)、italic (斜体)。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
             fontDisplay: "swap", // 字体显示策略，推荐 swap。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
-            localFamily: [`HarmonyOS Sans SC ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
+            localFamily: [`HarmonyOS Sans ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
             // commentUnicodes: false, // 在 CSS 中添加 Unicode 码点注释
             compress: false, // 压缩生成的 CSS 产物
         },
@@ -57,10 +57,10 @@ async function split(input, outDir, weight) {
     console.timeEnd("node");
 }
 
-// If HarmonyOS_Sans_SC_Webfont_Splitted already exists, raise error
-if (fs.existsSync("./HarmonyOS_Sans_SC_Webfont_Splitted")) {
+// If HarmonyOS_Sans_Webfont_Splitted already exists, raise error
+if (fs.existsSync("./HarmonyOS_Sans_Webfont_Splitted")) {
     console.error(
-        "HarmonyOS_Sans_SC_Webfont_Splitted/ already exists, delete it first."
+        "HarmonyOS_Sans_Webfont_Splitted/ already exists, delete it first."
     );
     process.exit(1);
 }
@@ -71,78 +71,63 @@ for (const file of fs.readdirSync("./HarmonyOS_Sans_SC")) {
     if (file.endsWith(".ttf")) {
         await split(
             `./HarmonyOS_Sans_SC/${file}`,
-            `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}`,
+            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}`,
             dirName
         );
-        // Copy ./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/result.css
-        // to ./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/${dirName}.css
+        // Copy ./HarmonyOS_Sans_Webfont_Splitted/${dirName}/result.css
+        // to ./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css
         fs.copyFileSync(
-            `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/result.css`,
-            `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/${dirName}.css`
+            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/result.css`,
+            `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`
         );
     }
 }
 
 // Make Merged Font
-// Mkdir ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged
-fs.mkdirSync("./HarmonyOS_Sans_SC_Webfont_Splitted/Merged");
+// Mkdir ./HarmonyOS_Sans_Webfont_Splitted/Merged
+fs.mkdirSync("./HarmonyOS_Sans_Webfont_Splitted/Merged");
 
-// Copy ./HarmonyOS_Sans_SC_Webfont_Splitted/[dirName]/*.woff2
-// to ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/
+// Copy ./HarmonyOS_Sans_Webfont_Splitted/[dirName]/*.woff2
+// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/
 for (const dirName in fontWeightMap) {
-    // List all files in ./HarmonyOS_Sans_SC_Webfont_Splitted/[dirName]
+    // List all files in ./HarmonyOS_Sans_Webfont_Splitted/[dirName]
     for (const file of fs.readdirSync(
-        `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}`
+        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}`
     )) {
         if (file.endsWith(".woff2")) {
             fs.copyFileSync(
-                `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/${file}`,
-                `./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/${file}`
+                `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${file}`,
+                `./HarmonyOS_Sans_Webfont_Splitted/Merged/${file}`
             );
         }
     }
 }
 
-// Copy ./HarmonyOS_Sans_SC_Webfont_Splitted/[dirName]/[dirName].css
-// to ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/[dirName].css
+// Copy ./HarmonyOS_Sans_Webfont_Splitted/[dirName]/[dirName].css
+// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/[dirName].css
 for (const dirName in fontWeightMap) {
     fs.copyFileSync(
-        `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/${dirName}.css`,
-        `./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/${dirName}.css`
+        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`,
+        `./HarmonyOS_Sans_Webfont_Splitted/Merged/${dirName}.css`
     );
 }
 
-// Merge ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/*.css
-// to ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/Merged.css
+// Merge ./HarmonyOS_Sans_Webfont_Splitted/Merged/*.css
+// to ./HarmonyOS_Sans_Webfont_Splitted/Merged/Merged.css
 var merged = `@charset "UTF-8";\n\n`;
 for (const dirName in fontWeightMap) {
     merged += `/* ${dirName}.css */\n`;
     merged += fs.readFileSync(
-        `./HarmonyOS_Sans_SC_Webfont_Splitted/${dirName}/${dirName}.css`,
+        `./HarmonyOS_Sans_Webfont_Splitted/${dirName}/${dirName}.css`,
         "utf8"
     );
     merged += "\n\n";
 }
 
-// Ref: https://github.com/IKKI2000/harmonyos-fonts/blob/main/css/harmonyos_sans_sc.css
-merged += `/* Language */
-:lang(Hans),
-:lang(zh),
-:lang(CHS),
-:lang(zh-CN),
-:lang(zh-SG),
-:lang(Jpan),
-:lang(ja) {
-    font-family: 'HarmonyOS Sans SC', sans-serif;
-}`;
+fs.writeFileSync("./HarmonyOS_Sans_Webfont_Splitted/Merged/index.css", merged);
 
-fs.writeFileSync(
-    "./HarmonyOS_Sans_SC_Webfont_Splitted/Merged/index.css",
-    merged
-);
-
-// Copy ./HarmonyOS_Sans_SC_Webfont_Splitted/Merged to ./dist recursively
-fs.cpSync("./HarmonyOS_Sans_SC_Webfont_Splitted/Merged", "./dist", {
+// Copy ./HarmonyOS_Sans_Webfont_Splitted/Merged to ./dist recursively
+fs.cpSync("./HarmonyOS_Sans_Webfont_Splitted/Merged", "./dist", {
     recursive: true,
 });
 
