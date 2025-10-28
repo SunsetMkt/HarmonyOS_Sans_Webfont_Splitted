@@ -9,9 +9,8 @@ HarmonyOS Sans Webfont Splitted by [KonghaYao/cn-font-split](https://github.com/
 ## Quick Start (Build)
 
 ```sh
-npm install -g pnpm
-pnpm install
-pnpm build
+npm install
+npm run build
 ```
 
 ## Thanks to
