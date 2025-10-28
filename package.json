@@ -27,7 +27,7 @@
         "url": "https://github.com/SunsetMkt/HarmonyOS_Sans_Webfont_Splitted/issues"
     },
     "homepage": "https://github.com/SunsetMkt/HarmonyOS_Sans_Webfont_Splitted#readme",
-    "dependencies": {
+    "devDependencies": {
         "cn-font-split": "6"
     },
     "type": "module"
