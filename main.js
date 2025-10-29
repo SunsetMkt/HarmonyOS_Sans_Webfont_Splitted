@@ -90,6 +90,9 @@ if (fs.existsSync("./dist")) {
     fs.rmSync("./dist", { recursive: true });
 }
 
+// To get this directory, download https://developer.huawei.com/images/download/next/HarmonyOS-Sans-v2.zip
+// And rename subfolders to HarmonyOS_Naskh_Arabic HarmonyOS_Naskh_Arabic_UI  HarmonyOS_Sans HarmonyOS_Sans_SC HarmonyOS_Sans_TC
+// etc. and place them in HarmonyOS_Sans folder
 const harmonyOsSansDir = "./HarmonyOS_Sans";
 
 // Check if HarmonyOS_Sans directory exists

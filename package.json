@@ -1,6 +1,6 @@
 {
     "name": "harmonyos-sans-webfont-splitted",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "HarmonyOS Sans Webfont Splitted by KonghaYao/cn-font-split.",
     "files": [
         "dist/",
@@ -9,10 +9,10 @@
         "package.json",
         "README.md"
     ],
-    "main": "dist/HarmonyOS_Sans/Regular/Regular.css",
-    "style": "dist/HarmonyOS_Sans/Regular/Regular.css",
+    "main": "dist/HarmonyOS_Sans_SC/index.css",
+    "style": "dist/HarmonyOS_Sans_SC/index.css",
     "exports": {
-        "default": "./dist/HarmonyOS_Sans/Regular/Regular.css"
+        "default": "./dist/HarmonyOS_Sans_SC/index.css"
     },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
