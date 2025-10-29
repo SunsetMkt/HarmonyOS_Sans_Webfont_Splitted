@@ -61,7 +61,7 @@ async function split(input, outDir, weight, fontFamily) {
             fontWeight: `${weight_num}`, // 字重: 400 (常规)、700(粗体), 详细可见 https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight
             fontStyle: fontStyle, // 字体样式: normal (常规)、italic (斜体)。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-style
             fontDisplay: "swap", // 字体显示策略，推荐 swap。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display
-            localFamily: [`${fontFamily} ${weight}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
+            localFamily: [`${fontFamily} ${weight}`, `${fontFamily}`], // 本地字体族名称。可见 https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face
             // commentUnicodes: false, // 在 CSS 中添加 Unicode 码点注释
             compress: true, // 压缩生成的 CSS 产物
         },
