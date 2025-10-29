@@ -51,7 +51,7 @@ async function split(input, outDir, weight, fontFamily) {
         fontStyle = "italic";
     }
 
-    console.time("node");
+    console.time("split");
     await fontSplit({
         input: inputBuffer, // 输入的字体缓冲区
         outDir: outDir, // 输出目录
@@ -81,7 +81,7 @@ async function split(input, outDir, weight, fontFamily) {
         // 自定义分包输出的文件名为 6 位短哈希，或者使用自增索引: '[index].[ext]'
         renameOutputFont: `${weight}_[hash:6][ext]`,
     });
-    console.timeEnd("node");
+    console.timeEnd("split");
 }
 
 // If dist already exists, delete it
@@ -148,6 +148,28 @@ for (const subfolder of fontSubfolders) {
             .replace(/\.\//g, `./${weight}/`);
         fs.writeFileSync(upperFolderCssPath, upperFolderCssContent);
     }
+}
+
+// For every subfolder in dist folder, merge css files in subfolder root into a single css file
+console.log("\nMerging every font's weights to a single file...");
+const distSubfolders = fs.readdirSync("./dist").filter((item) => {
+    const itemPath = path.join("./dist", item);
+    return fs.statSync(itemPath).isDirectory();
+});
+
+for (const subfolder of distSubfolders) {
+    const subfolderPath = path.join("./dist", subfolder);
+    const files = fs.readdirSync(subfolderPath);
+
+    const mergedCssPath = path.join(subfolderPath, "Merged.css");
+    const mergedCssContent = files
+        .filter((file) => file.endsWith(".css"))
+        .map((file) => fs.readFileSync(path.join(subfolderPath, file), "utf-8"))
+        .join("\n");
+    fs.writeFileSync(mergedCssPath, mergedCssContent);
+    // Copy Merged.css to index.css
+    const indexCssPath = path.join(subfolderPath, "index.css");
+    fs.copyFileSync(mergedCssPath, indexCssPath);
 }
 
 console.log("\nDone!");
